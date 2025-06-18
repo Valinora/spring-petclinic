@@ -13,7 +13,7 @@ sourceCompatibility = '17'
 
 repositories {
   maven {
-    url = "http://192.168.56.10:8081/repository/maven-releases/"
+    url = uri("http://192.168.56.10:8081/repository/maven-releases/")
   }
 }
 
