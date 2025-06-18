@@ -28,7 +28,7 @@ jobs:
       - name: Build with Maven Wrapper
         run: ./mvnw -B package
       - name: Publish to Nexus
-        # env:
-          # NEXUS_USER: ${{ secrets.NEXUS_USER }}
-          # NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
-        run: ./gradlew --no-daemon publish
+        env:
+          NEXUS_USER: ${{ secrets.NEXUS_USER }}
+          NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+        run: ./mvnw -B clean deploy
