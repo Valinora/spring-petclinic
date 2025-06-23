@@ -5,6 +5,7 @@ plugins {
   id 'org.graalvm.buildtools.native' version '0.9.22'
 }
 
+
 apply plugin: 'java'
 
 group = 'org.springframework.samples'
