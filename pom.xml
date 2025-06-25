@@ -4,7 +4,6 @@
   <groupId>org.springframework.samples</groupId>
   <artifactId>spring-petclinic</artifactId>
   <version>3.1.0</version>
-
   <distributionManagement>
     <repository>
       <id>nexus-releases</id>
