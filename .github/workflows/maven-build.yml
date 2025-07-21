@@ -21,8 +21,9 @@ jobs:
             username: ${{ secrets.REGISTRY_USERNAME }}
             password: ${{ secrets.REGISTRY_PASSWORD }}
         - run: |
-            docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/spring-petclinic:${{ github.sha }}
-            docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/spring-petclinic:${{ github.sha }}
+            ./mvnw spring-boot:build-image
+            docker tag spring-petclinic:3.1.0 ${{ secrets.REGISTRY_LOGIN_SERVER }}/spring-petclinic:3.1.0
+            docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/spring-petclinic:3.1.0
 
         - name: Set environment variable'
           uses: azure/appservice-settings@v1
