@@ -28,7 +28,7 @@ jobs:
         - name: Set environment variable'
           uses: azure/appservice-settings@v1
           with:
-              app-name: spring-petclinic
+              app-name: spring-petclinic-1753128135832
               app-settings-json: |
                   [
                       {
@@ -40,5 +40,5 @@ jobs:
         - name: 'Run Azure webapp deploy action using publish profile credentials'
           uses: azure/webapps-deploy@v3
           with: 
-            app-name: spring-petclinic
+            app-name: spring-petclinic-1753128135832
             images: '${{ secrets.REGISTRY_LOGIN_SERVER }}/spring-petclinic:${{ github.sha }}'
