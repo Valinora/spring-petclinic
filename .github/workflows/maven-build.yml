@@ -1,50 +1,43 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
-
-name: Java CI with Maven
-
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+on: [push]
+name: Linux_Container_Workflow
 
 jobs:
-  build:
+    build-and-deploy:
+        runs-on: ubuntu-latest
+        steps:
+        # checkout the repo
+        - name: 'Checkout GitHub Action'
+          uses: actions/checkout@main
+          
+        - name: 'Login via Azure CLI'
+          uses: azure/login@v1
+          with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
+        - name: 'Build and push image'
+          uses: azure/docker-login@v1
+          with:
+            login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+            username: ${{ secrets.REGISTRY_USERNAME }}
+            password: ${{ secrets.REGISTRY_PASSWORD }}
+        - run: |
+            docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/spring-petclinic:${{ github.sha }}
+            docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/spring-petclinic:${{ github.sha }}
 
-    runs-on: self-hosted
-    strategy:
-      matrix:
-        java: [ '17' ]
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK ${{matrix.java}}
-        uses: actions/setup-java@v4
-        with:
-          java-version: ${{matrix.java}}
-          distribution: 'adopt'
-          cache: maven
-      - name: Build with Maven Wrapper
-        run: ./mvnw -B package
-      - name: Configure Maven Settings
-        run: |
-          mkdir -p ~/.m2
-          cat > ~/.m2/settings.xml <<'EOF'
-          <settings>
-            <servers>
-              <server>
-                <id>nexus-releases</id>
-                <username>${{ secrets.NEXUS_USER }}</username>
-                <password>${{ secrets.NEXUS_PASSWORD }}</password>
-              </server>
-              <server>
-                <id>nexus-snapshots</id>
-                <username>${{ secrets.NEXUS_USER }}</username>
-                <password>${{ secrets.NEXUS_PASSWORD }}</password>
-              </server>
-            </servers>
-          </settings>
-          EOF
-      - name: Publish to Nexus
-        run: ./mvnw -B clean deploy
+        - name: Set environment variable'
+          uses: azure/appservice-settings@v1
+          with:
+              app-name: ${{ env.AZURE_WEBAPP_NAME }}
+              app-settings-json: |
+                  [
+                      {
+                          "name": "WEBSITES_PORT",
+                          "value": "8080",
+                          "slotSetting": false
+                      }
+                  ]
+        - name: 'Run Azure webapp deploy action using publish profile credentials'
+          uses: azure/webapps-deploy@v3
+          with: 
+            app-name: ${{ env.AZURE_WEBAPP_NAME }}
+            images: '${{ secrets.REGISTRY_LOGIN_SERVER }}/spring-petclinic:${{ github.sha }}'
