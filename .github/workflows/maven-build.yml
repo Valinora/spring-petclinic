@@ -28,5 +28,5 @@ jobs:
         - name: 'Run Azure webapp deploy action using publish profile credentials'
           uses: azure/webapps-deploy@v3
           with: 
-            app-name: asp-spring-petclinic-1753128135832
-            images: '${{ secrets.REGISTRY_LOGIN_SERVER }}/spring-petclinic:${{ github.sha }}'
+            app-name: spring-petclinic-container
+            images: '${{ secrets.REGISTRY_LOGIN_SERVER }}/spring-petclinic:3.1.0'
