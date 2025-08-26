@@ -25,5 +25,13 @@ jobs:
           java-version: ${{matrix.java}}
           distribution: 'adopt'
           cache: maven
+    
+      - name: Maven version
+        run: |
+            mkdir -p ./.mvn
+            echo "--settings" >> ./.mvn/maven.config
+            echo "$( pwd )/.github/maven-settings.xml" >> ./.mvn/maven.config
+            mvn --version
+            mkdir -p target
       - name: Build with Maven Wrapper
         run: ./mvnw -B package
