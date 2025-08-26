@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      MAVEN_ARGS: -e -B -ntp -DtrimStackTrace=false
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  #v4.2.2
+      with:
+        ref: "main"
+        fetch-tags: true
+
+    - name: Setup git
+      run: |
+        git config --global user.name "Colin Jamison (CI)"
+        git config --global user.email "colin.jamison@liatrio.com"
+
+    - name: Set up JDK
+      uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12  #v4.7.0
+      with:
+        java-version: 17
+        distribution: 'temurin'
+        cache: 'maven'
+
+    - name: Maven version
+      run: |
+        mkdir -p ./.mvn
+        echo "--settings" >> ./.mvn/maven.config
+        echo "$( pwd )/.github/maven-settings.xml" >> ./.mvn/maven.config
+        mvn --version
+        mkdir -p target
+
+    #------------------------------------------------------------------------
+    - name: Maven release
+      env:
+        OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+        OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
+      run: |
+        mvn clean deploy
+
