@@ -1,16 +1,20 @@
-name: Release
+name: Petclinic Release
 
 on:
   push:
     tags:
       - 'v*'
   workflow_dispatch:
+  workflow_run:
+      workflows: ["Joda Release"]
+      types: [completed]
 
 permissions:
   contents: write
 
 jobs:
-  build:
+  trigger:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     env:
       MAVEN_ARGS: -e -B -ntp -DtrimStackTrace=false

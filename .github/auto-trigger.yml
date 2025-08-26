@@ -1,0 +1,15 @@
+name: Release on A Success
+
+on:
+  workflow_run:
+    workflows: ["Release"]   # must match Project A's release workflow name
+    types:
+      - completed
+
+jobs:
+  trigger:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build Release
+        uses: ./
